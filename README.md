@@ -34,6 +34,9 @@ How to use
 
 #####Options:
   -v                      open with specific sublime version, if not set, find sublime version(2 to 3)
+  
   -d                      create or open directory with sublime text
+  
   -f                       create or open file with sublime text
+  
   -h[, --help]         create or open directory with sublime
