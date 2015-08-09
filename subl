@@ -65,11 +65,11 @@ exec_sublime() {
 open_with_sublime() {
   
   sublime_version='2'
-  failed=`exec_sublime $sublime_version $1`
+  failed=`exec_sublime $sublime_version $@`
 
   if [[ $failed = "failed" ]]; then
     sublime_version='3'
-    failed=`exec_sublime $sublime_version $1`
+    failed=`exec_sublime $sublime_version $@`
 
     if [[ $failed = "failed" ]]; then
       echo_bold $SUBLIME_FIND_ERROR_MSG
@@ -99,6 +99,10 @@ parse_options() {
 
     if [ "${options[$i]}" = "-v" ]; then
       check_specfic_version=1
+    elif [ "${options[$i]}" = "-d" ]; then
+      mode='dir'
+    elif [ "${options[$i]}" = "-f" ]; then
+      mode='file'
     elif [ $check_specfic_version = 1 ]; then
       if [ "${options[$i]}" = '2' -o ${options[$i]} = '3' ]; then
         specific_version=${options[$i]}
