@@ -10,6 +10,8 @@
 # @license MIT
 #################################
 
+BASEDIR=$(dirname $0)
+
 print_bold() {
   printf "\033[1m$1\033[0m"
 }
@@ -23,14 +25,27 @@ print_help() {
   echo "  subl [<existed file> | <new file> | <existed dir>] [-v] [-h] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]"
   echo
   echo_bold "Options:"
-  printf "  \033[1m%-25s\033[0m %-25s\n" "-v" "create or open directory with sublime text"
+  printf "  \033[1m%-25s\033[0m %-25s\n" "-v" "open with specific sublime version"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-d" "create or open directory with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-f" "create or open file with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-h[, --help]" "create or open directory with sublime"
 }
 
-open_with_sublime() {
+check_user_os() {
+  if [ "$(uname)" == "Darwin" ]; then
+    echo "mac"
+  else
+    echo "not mac"
+  fi
+}
 
+open_with_sublime() {
+  
+  sublime_version='3'
+  
+  echo "open -b com.sublimetext.$sublime_version $1"
+
+  output=`open -b com.sublimetext.$sublime_version $1`
 }
 
 create_dir() {
@@ -39,7 +54,8 @@ create_dir() {
 
 create_file() {
   file=$1
-  mkdir -p -- "${file%/*}" && touch -- "$file"
+  # mkdir -p -- "${file%/*}" && touch -- "$file"
+  touch "$file"
 }
 
 parse_options() {
@@ -50,13 +66,16 @@ parse_options() {
   mode="file" # defualt mode(create or open) is file
 
   for (( i=0; i<${options_len}; i++ )); do
-    if [ mode = 'file' ]; then 
-      if ! [[ -f options[$i] ]]; then
-        create_file options[$i]
+    
+    path="$BASEDIR/${options[$i]}"
+
+    if [ $mode = 'file' ]; then 
+      if ! [[ -f  $path ]]; then
+        create_file $path
       fi
-    elif [ mode = 'dir' ]; then
-      if ! [[ -d options[$i] ]]; then
-        create_dir options[$i]
+    elif [ $mode = 'dir' ]; then
+      if ! [[ -d $path ]]; then
+        create_dir $path
       fi
     fi
 
@@ -67,6 +86,12 @@ parse_options() {
 }
 
 main() {
+  user_os="$( check_user_os )"
+
+  if ! [ "$user_os" = "mac" ]; then
+    echo_bold "This script only run in OS X, Sorry.."
+    exit
+  fi
 
   if [[ $# = 0 ]]; then
       print_help
