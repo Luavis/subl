@@ -46,7 +46,7 @@ fi
 
 # check curl exists
 
-if [[ $CURL_EXISTS = "git not found" ]]; then
+if [[ $CURL_EXISTS = "curl not found" ]]; then
   echo_err "Please install curl first"
   exit 1
 fi
@@ -58,17 +58,17 @@ echo "==================================="
 
 echo "Start Installing..."
 echo 
-echo_bold "\t* Installing git ignore binary"
+echo_bold "Installing git ignore binary"
 
 if [[ -f $BIN_PATH/$INSTALL_FILE ]]; then # remove git ignore
-  echo_bold "\t  Remove present git-ignore"
+  echo_bold "\t  Remove present subl"
   rm -f $BIN_PATH/$INSTALL_FILE
 fi
 
 # install in bin
 curl -sL $INSTALL_URL > $BIN_PATH/$INSTALL_FILE
 
-printf "\t  Change git ignore permission as excutable\n"
+printf "\t  Change subl permission as excutable\n"
 
 # change permission
 chmod 755 $BIN_PATH/$INSTALL_FILE
