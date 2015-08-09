@@ -24,7 +24,7 @@ echo_bold() {
 }
 
 print_help() {
-  echo_bold "\033[1mUsage\033[0m:"
+  echo_bold "Usage:"
   echo "  subl [-v version] [-h] [<existed file> | <new file> | <existed dir>] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]"
   echo
   echo_bold "Options:"
