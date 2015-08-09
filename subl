@@ -20,20 +20,26 @@ echo_bold() {
 
 print_help() {
   echo_bold "\033[1mUsage\033[0m:"
-  echo "  subl [<existed file> | <new file> | <existed dir>] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]"
+  echo "  subl [<existed file> | <new file> | <existed dir>] [-v] [-h] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]"
   echo
   echo_bold "Options:"
+  printf "  \033[1m%-25s\033[0m %-25s\n" "-v" "create or open directory with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-d" "create or open directory with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-f" "create or open file with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-h[, --help]" "create or open directory with sublime"
 }
 
-# open_with_sublime() {
+open_with_sublime() {
 
-# }
+}
 
 create_dir() {
   mkdir -p $1
+}
+
+create_file() {
+  file=$1
+  mkdir -p -- "${file%/*}" && touch -- "$file"
 }
 
 parse_options() {
@@ -41,12 +47,23 @@ parse_options() {
   options_len=${#options[@]}
 
   sublime_option=""
+  mode="file" # defualt mode(create or open) is file
 
   for (( i=0; i<${options_len}; i++ )); do
-    echo "${options[$i]}"
+    if [ mode = 'file' ]; then 
+      if ! [[ -f options[$i] ]]; then
+        create_file options[$i]
+      fi
+    elif [ mode = 'dir' ]; then
+      if ! [[ -d options[$i] ]]; then
+        create_dir options[$i]
+      fi
+    fi
 
-    sublime_option="${sublime_option} ${}"
+    sublime_option="${sublime_option} ${options[$i]}"  # concat string
   done
+
+  open_with_sublime $sublime_option
 }
 
 main() {
