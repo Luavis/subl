@@ -40,3 +40,12 @@ How to use
   -f                       create or open file with sublime text
   
   -h[, --help]         create or open directory with sublime
+
+Example
+====
+```shell
+$ subl .gitignore
+$ subl -d src
+$ subl -d project_dir
+$ subl index.html style.css
+```
