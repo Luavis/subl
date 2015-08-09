@@ -11,21 +11,24 @@
 #################################
 
 BASEDIR=$(dirname $0)
+SUBLIME_FIND_ERROR_MSG="Can't find sublime text"
+SUBLIME_WRONG_VERSION_MSG="Wrong sublime text, It support only -v 2 or -v 3."
 
 print_bold() {
-  printf "\033[1m$1\033[0m"
+  printf "\033[1m%s\033[0m " "$@"
 }
 
 echo_bold() {
-  printf "\033[1m$1\033[0m\n"
+  printf "\033[1m%s\033[0m " "$@"
+  echo
 }
 
 print_help() {
   echo_bold "\033[1mUsage\033[0m:"
-  echo "  subl [<existed file> | <new file> | <existed dir>] [-v] [-h] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]"
+  echo "  subl [-v version] [-h] [<existed file> | <new file> | <existed dir>] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]"
   echo
   echo_bold "Options:"
-  printf "  \033[1m%-25s\033[0m %-25s\n" "-v" "open with specific sublime version"
+  printf "  \033[1m%-25s\033[0m %-25s\n" "-v" "open with specific sublime version, if not set, find sublime version(2 to 3)"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-d" "create or open directory with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-f" "create or open file with sublime text"
   printf "  \033[1m%-25s\033[0m %-25s\n" "-h[, --help]" "create or open directory with sublime"
@@ -39,13 +42,39 @@ check_user_os() {
   fi
 }
 
+exec_sublime() {
+  args=( "$@" )
+  args_len=${#args[@]}
+  sublime_version=$1
+  sublime_args=""
+
+  for (( i=1; i<${args_len}; i++ )); do
+    sublime_args="$sublime_args ${args[i]}"
+  done
+
+  output=`open -b com.sublimetext.$sublime_version$sublime_args 2>&1 >/dev/null`
+
+  # check failed
+  if [[ $output = *"LSGetApplicationForInfo"* ]]; then
+    echo 'failed'
+  else
+    echo 'success'
+  fi
+}
+
 open_with_sublime() {
   
-  sublime_version='3'
-  
-  echo "open -b com.sublimetext.$sublime_version $1"
+  sublime_version='2'
+  failed=`exec_sublime $sublime_version $1`
 
-  output=`open -b com.sublimetext.$sublime_version $1`
+  if [[ $failed = "failed" ]]; then
+    sublime_version='3'
+    failed=`exec_sublime $sublime_version $1`
+
+    if [[ $failed = "failed" ]]; then
+      echo_bold $SUBLIME_FIND_ERROR_MSG
+    fi
+  fi
 }
 
 create_dir() {
@@ -61,28 +90,52 @@ create_file() {
 parse_options() {
   options=( "$@" )
   options_len=${#options[@]}
-
+  specific_version="none"
   sublime_option=""
+  check_specfic_version=0  # false
   mode="file" # defualt mode(create or open) is file
 
   for (( i=0; i<${options_len}; i++ )); do
-    
-    path="$BASEDIR/${options[$i]}"
 
-    if [ $mode = 'file' ]; then 
-      if ! [[ -f  $path ]]; then
-        create_file $path
+    if [ "${options[$i]}" = "-v" ]; then
+      check_specfic_version=1
+    elif [ $check_specfic_version = 1 ]; then
+      if [ "${options[$i]}" = '2' -o ${options[$i]} = '3' ]; then
+        specific_version=${options[$i]}
+      else
+        echo_bold $SUBLIME_WRONG_VERSION_MSG
+        exit
       fi
-    elif [ $mode = 'dir' ]; then
-      if ! [[ -d $path ]]; then
-        create_dir $path
+
+      check_specfic_version=0  # change version
+
+    else
+      path="$BASEDIR/${options[$i]}"
+
+      if [ $mode = 'file' ]; then 
+        if ! [[ -f  $path ]]; then
+          create_file $path
+        fi
+      elif [ $mode = 'dir' ]; then
+        if ! [[ -d $path ]]; then
+          create_dir $path
+        fi
       fi
+
+      sublime_option="${sublime_option} ${options[$i]}"  # concat string
     fi
-
-    sublime_option="${sublime_option} ${options[$i]}"  # concat string
   done
 
-  open_with_sublime $sublime_option
+  if [ $specific_version = "none" ]; then
+    open_with_sublime $sublime_option
+  else 
+    failed=`exec_sublime $specific_version $sublime_option`
+
+    if [[ $failed = "failed" ]]; then
+      print_bold $SUBLIME_FIND_ERROR_MSG
+      echo_bold $specific_version
+    fi
+  fi
 }
 
 main() {
