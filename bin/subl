@@ -10,7 +10,7 @@
 # @license MIT
 #################################
 
-BASEDIR=$(dirname $0)
+BASEDIR="$(pwd)"
 SUBLIME_FIND_ERROR_MSG="Can't find sublime text"
 SUBLIME_WRONG_VERSION_MSG="Wrong sublime text, It support only -v 2 or -v 3."
 
