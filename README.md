@@ -1,5 +1,5 @@
 # subl
-Sublime terminal opener for mac
+Sublime Text 2/3 command line opener for osx
 
 Support
 ====
