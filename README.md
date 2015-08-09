@@ -30,7 +30,7 @@ How to use
 ====
 
 #####Usage:
-  subl [-v version] [-h] [<existed file> | <new file> | <existed dir>] [-d <existed dir>|<new dir name>] [-f <existed file> | <new file>]
+  ```subl [-v version ] [-h] [ existed file | new file | existed dir ] [-d existed dir | new dir name ] [-f existed file | new file ]```
 
 #####Options:
   -v                      open with specific sublime version, if not set, find sublime version(2 to 3)
