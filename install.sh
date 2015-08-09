@@ -61,7 +61,8 @@ echo
 echo_bold "Installing git ignore binary"
 
 if [[ -f $BIN_PATH/$INSTALL_FILE ]]; then # remove git ignore
-  echo_bold "\t  Remove present subl"
+  printf "\t"
+  echo_bold "  Remove present subl"
   rm -f $BIN_PATH/$INSTALL_FILE
 fi
 
